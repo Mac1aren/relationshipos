@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RelationshipOS v0.2 β ♡</title>
+<meta name="theme-color" content="#f7b9d4">
+<meta property="og:title" content="RelationshipOS v0.2 β ♡">
+<meta property="og:description" content="booting cute things... don't panic (´｡• ◡ •｡`)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#ff6fa5;
+    --pink-soft:#ffa6c9;
+    --pink-pale:#ffe0ee;
+    --ink:#7a2c52;
+    --mint:#5fd0a8;
+    --panel:rgba(255, 233, 244, 0.62);
+    --panel-edge:rgba(255,255,255,0.75);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;min-height:100%;}
+  body{
+    font-family:'VT323','Courier New',ui-monospace,monospace;
+    color:var(--ink);
+    background:
+      radial-gradient(120% 60% at 50% 0%, #ffd9ea 0%, transparent 60%),
+      radial-gradient(120% 80% at 50% 100%, #ffc3e0 0%, transparent 55%),
+      linear-gradient(180deg,#ffd2e8 0%, #ffbfde 45%, #ffd0e8 100%);
+    min-height:100vh;
+    display:flex;justify-content:center;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    overflow-x:hidden;
+  }
+  /* optional user wallpaper behind everything: drop wallpaper.jpg next to index.html */
+  .wallpaper{
+    position:fixed;inset:0;z-index:0;
+    background-image:url('./wallpaper.jpg');
+    background-size:cover;background-position:center;
+    opacity:.55;
+  }
+  .veil{position:fixed;inset:0;z-index:1;background:linear-gradient(180deg,rgba(255,209,233,.55),rgba(255,191,222,.45));}
+
+  /* floating cute particles */
+  .sky{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
+  .sky span{position:absolute;bottom:-30px;font-size:18px;color:#fff;opacity:0;animation:float linear infinite;text-shadow:0 0 6px rgba(255,120,170,.6);}
+  @keyframes float{
+    0%{transform:translateY(0) rotate(0);opacity:0;}
+    10%{opacity:.9;}
+    90%{opacity:.8;}
+    100%{transform:translateY(-115vh) rotate(220deg);opacity:0;}
+  }
+
+  .phone{
+    position:relative;z-index:3;
+    width:100%;max-width:430px;
+    padding:26px 16px 40px;
+    display:flex;flex-direction:column;align-items:center;
+  }
+
+  .screen{
+    width:100%;
+    background:var(--panel);
+    border:1.5px solid var(--panel-edge);
+    border-radius:22px;
+    backdrop-filter:blur(9px) saturate(1.2);
+    -webkit-backdrop-filter:blur(9px) saturate(1.2);
+    box-shadow:0 18px 50px rgba(225,90,150,.35), inset 0 0 0 4px rgba(255,255,255,.18);
+    padding:22px 18px 26px;
+  }
+
+  .titlebar{display:flex;align-items:center;gap:7px;margin-bottom:14px;}
+  .dot{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 1px rgba(255,255,255,.5) inset;}
+  .dot.r{background:#ff7eb0;} .dot.y{background:#ffd36e;} .dot.g{background:#86e3b8;}
+  .titlebar b{margin-left:auto;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;color:#b14d7e;letter-spacing:.3px;}
+
+  .log{font-size:22px;line-height:1.5;letter-spacing:.5px;}
+  .line,.mod{opacity:0;transform:translateY(6px);animation:pop .35s ease forwards;animation-delay:calc(var(--i,0) * .14s + .2s);}
+  @keyframes pop{to{opacity:1;transform:translateY(0);}}
+
+  .line{text-align:center;white-space:pre-wrap;word-break:break-word;}
+  .line.head{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:24px;color:var(--pink);text-shadow:0 1px 0 #fff;}
+  .line.div{color:#ffaccd;letter-spacing:2px;font-size:18px;margin:6px 0;}
+  .line.kao{color:#c06893;font-size:20px;}
+  .line.dim{color:#a86b8c;}
+  .spacer{height:10px;}
+
+  .mod{display:flex;align-items:center;gap:8px;font-size:21px;}
+  .mod .name{color:var(--ink);}
+  .mod .lead{flex:1;border-bottom:2px dotted #e79bbe;transform:translateY(-4px);min-width:10px;}
+  .mod .ok{color:var(--mint);white-space:nowrap;text-shadow:0 0 8px rgba(95,208,168,.4);}
+  .mod.warn .ok{color:#ff7d7d;text-shadow:0 0 8px rgba(255,125,125,.4);}
+
+  .bar{text-align:center;font-size:20px;letter-spacing:1px;color:var(--pink);}
+  .bar .pct{color:#b14d7e;}
+
+  .caret{display:inline-block;width:11px;height:20px;background:var(--pink);margin-left:2px;vertical-align:-3px;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  .continue{margin-top:6px;text-align:center;color:var(--pink);font-size:22px;animation:bob 1.6s ease-in-out infinite;}
+  @keyframes bob{50%{transform:translateY(4px);}}
+
+  /* telegram button */
+  .tg{
+    opacity:0;transform:translateY(10px) scale(.96);
+    animation:pop .5s ease forwards;animation-delay:calc(var(--last,40) * .14s + .5s);
+    margin-top:18px;width:100%;display:flex;justify-content:center;
+  }
+  .tg a{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:'Baloo 2',sans-serif;font-weight:700;font-size:17px;letter-spacing:.3px;
+    color:#fff;text-decoration:none;
+    padding:14px 26px;border-radius:999px;
+    background:linear-gradient(135deg,#ff8fc0,#ff5e9e 60%,#ff7ab0);
+    box-shadow:0 10px 26px rgba(255,94,158,.5), inset 0 1px 0 rgba(255,255,255,.6);
+    border:2px solid rgba(255,255,255,.6);
+    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .tg a:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 16px 34px rgba(255,94,158,.6);filter:brightness(1.04);}
+  .tg a:active{transform:translateY(0) scale(.99);}
+  .tg svg{width:22px;height:22px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15));}
+
+  .handle{margin-top:12px;text-align:center;color:#b14d7e;font-size:18px;z-index:3;}
+  .footer{margin-top:8px;text-align:center;color:#c781a3;font-size:15px;}
+
+  @media (max-width:380px){ .log{font-size:20px;} .mod{font-size:19px;} }
+</style>
+</head>
+<body>
+  <div class="wallpaper"></div>
+  <div class="veil"></div>
+  <div class="sky" id="sky"></div>
+
+  <main class="phone">
+    <section class="screen">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <b>RelationshipOS</b>
+      </div>
+
+      <div class="log" id="log">
+        <div class="line div">୧ ─────────────── ୨</div>
+        <div class="line">୧₊˚⊹♡ Welcome ♡⊹˚₊</div>
+        <div class="line head">RelationshipOS v0.2 β</div>
+        <div class="line kao">₍^. .^₎⟆</div>
+        <div class="spacer"></div>
+
+        <div class="line dim">┊ booting system...</div>
+        <div class="line dim">┊♡ please wait...</div>
+        <div class="line dim">┊✧ loading cute things...</div>
+        <div class="line">♡ don't panic (´｡• ◡ •｡`)</div>
+        <div class="spacer"></div>
+
+        <div class="line div">⋆｡ﾟ☁︎｡⋆｡ ﾟ☾ ﾟ｡⋆</div>
+        <div class="line">♡ ✧ ♡ ✧ ♡</div>
+        <div class="line div">⋆｡ﾟ☁︎｡⋆｡ ﾟ☾ ﾟ｡⋆</div>
+        <div class="spacer"></div>
+
+        <div class="line kao">૮ ˶ᵔ ᵕ ᵔ˶ આ</div>
+        <div class="line dim">Initializing modules...</div>
+        <div class="line div">୨୧ ─────────────── ୨୧</div>
+        <div class="spacer"></div>
+
+        <div class="mod"><span class="name">♡ Simba.exe</span><span class="lead"></span><span class="ok">✓ loaded</span></div>
+        <div class="mod"><span class="name">♡ Buka.exe</span><span class="lead"></span><span class="ok">✓ loaded</span></div>
+        <div class="mod"><span class="name">♡ Katya.dll</span><span class="lead"></span><span class="ok">✓ loaded</span></div>
+        <div class="mod"><span class="name">♡ Pink aesthetic</span><span class="lead"></span><span class="ok">✓ enabled</span></div>
+        <div class="mod"><span class="name">♡ Sweet pastries</span><span class="lead"></span><span class="ok">✓ detected</span></div>
+        <div class="mod"><span class="name">♡ Cat hair</span><span class="lead"></span><span class="ok">✓ everywhere</span></div>
+        <div class="mod"><span class="name">♡ Silly jokes</span><span class="lead"></span><span class="ok">✓ loaded</span></div>
+        <div class="mod warn"><span class="name">♡ Red flags</span><span class="lead"></span><span class="ok">✓ found</span></div>
+        <div class="mod warn"><span class="name">♡ Emotional damage</span><span class="lead"></span><span class="ok">✓ archived</span></div>
+        <div class="line div">୨୧ ─────────────── ୨୧</div>
+        <div class="spacer"></div>
+
+        <div class="line kao">(づ｡◕‿‿◕｡)づ</div>
+        <div class="line head" style="font-size:20px;">Relationship Scan</div>
+        <div class="line bar">□ □ □ □ □ □ □ □ □ □ <span class="pct">0%</span></div>
+        <div class="line bar">■ □ □ □ □ □ □ □ □ □ <span class="pct">10%</span></div>
+        <div class="line bar">■ ■ ■ □ □ □ □ □ □ □ <span class="pct">30%</span></div>
+        <div class="line bar">■ ■ ■ ■ ■ ■ □ □ □ □ <span class="pct">60%</span></div>
+        <div class="line bar">■ ■ ■ ■ ■ ■ ■ ■ □ □ <span class="pct">80%</span></div>
+        <div class="line bar">■ ■ ■ ■ ■ ■ ■ ■ ■ ■ <span class="pct">100%</span></div>
+        <div class="line"><span style="color:var(--mint)">✓ Scan complete</span><span class="caret"></span></div>
+        <div class="line div">୨୧ ─────────────── ୨୧</div>
+        <div class="spacer"></div>
+
+        <div class="line continue">♡ continue ↓ ♡</div>
+      </div>
+
+      <div class="tg" id="tg">
+        <a href="https://t.me/raam_est" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M21.94 4.3 18.9 19.06c-.23 1.02-.84 1.27-1.7.79l-4.7-3.46-2.27 2.18c-.25.25-.46.46-.94.46l.33-4.78L18.6 5.9c.38-.34-.08-.53-.59-.19L6.6 13.06l-4.66-1.46c-1.01-.32-1.03-1.01.21-1.5L20.63 2.8c.85-.31 1.59.2 1.31 1.5z"/>
+          </svg>
+          Open Telegram
+        </a>
+      </div>
+    </section>
+
+    <div class="handle">@raam_est</div>
+    <div class="footer">made with ♡</div>
+  </main>
+
+<script>
+  // stagger animation order across all log children
+  (function(){
+    var nodes = document.querySelectorAll('#log > .line, #log > .mod, #log > .spacer');
+    var i = 0;
+    nodes.forEach(function(n){
+      if(n.classList.contains('spacer')) return;       // spacers don't animate
+      n.style.setProperty('--i', i);
+      i++;
+    });
+    document.getElementById('tg').style.setProperty('--last', i);
+
+    // floating hearts / sparkles
+    var glyphs = ['♡','✧','❀','☁︎','⋆','✦','ෆ'];
+    var sky = document.getElementById('sky');
+    for(var k=0;k<22;k++){
+      var s = document.createElement('span');
+      s.textContent = glyphs[Math.floor(Math.random()*glyphs.length)];
+      s.style.left = (Math.random()*100) + '%';
+      s.style.fontSize = (12 + Math.random()*16) + 'px';
+      s.style.animationDuration = (9 + Math.random()*10) + 's';
+      s.style.animationDelay = (-Math.random()*16) + 's';
+      sky.appendChild(s);
+    }
+  })();
+</script>
+</body>
+</html>
+
+# RelationshipOS v0.2 β ♡ — мобильный сайт
+
+Милый boot-screen сайт под телефон с анимацией загрузки и кнопкой на Telegram (`@raam_est`).
+
+## Что внутри папки
+- `index.html` — сам сайт (всё в одном файле: вёрстка, стили, анимация).
+- `wallpaper.jpg` — **сюда положи свои розовые обои** (см. ниже). Без файла сайт всё равно красивый — под ним лежит розовый CSS-фон.
+
+## 1. Добавить свои обои
+1. Сохрани ту самую розовую картинку-коллаж как `wallpaper.jpg`.
+2. Положи её в эту же папку, рядом с `index.html`.
+3. Готово — сайт сам подхватит `./wallpaper.jpg` как фон (поверх неё лёгкая розовая вуаль, чтобы текст читался).
+
+> Хочешь другое имя/формат (например `.png`) — поменяй строку `url('./wallpaper.jpg')` в `index.html` (блок `.wallpaper`).
+
+## 2. Что можно быстро поменять
+- **Ссылка на Telegram** — в `index.html` найди `https://t.me/raam_est` и замени при необходимости.
+- **Текст лога** — это обычные строки `<div class="line">…</div>` внутри `<div class="log">`. Добавляй/удаляй строки как хочешь, анимация порядка подстроится сама.
+- **Цвета** — вверху в `:root` (`--pink`, `--ink`, `--mint` и т.д.).
+
+## 3. Залить на GitHub Pages
+1. Зайди на https://github.com → **New repository**. Имя любое, например `relationshipos`. Сделай его **Public**.
+2. На странице репозитория → **Add file → Upload files** → перетащи `index.html` и `wallpaper.jpg` → **Commit changes**.
+3. **Settings → Pages**. В разделе *Build and deployment*: Source = **Deploy from a branch**, Branch = **main**, папка **/ (root)** → **Save**.
+4. Через 1–2 минуты сайт будет доступен по адресу `https://<твой-логин>.github.io/relationshipos/`.
+
+## 4. Привязать свой домен
+У тебя уже есть купленный домен — привязка делается в два шага.
+
+**A. В GitHub:**
+1. **Settings → Pages → Custom domain** → впиши свой домен (например `raam.example` или `os.raam.example`) → **Save**.
+   GitHub сам создаст в репозитории файл `CNAME` с этим именем.
+2. Позже включи галочку **Enforce HTTPS** (станет доступна после проверки DNS).
+
+**B. В панели управления доменом (там, где покупал) — добавь DNS-записи:**
+
+Если используешь **корневой домен** (`raam.example`) — добавь 4 A-записи:
+```
+A   @   185.199.108.153
+A   @   185.199.109.153
+A   @   185.199.110.153
+A   @   185.199.111.153
+```
+И желательно AAAA (IPv6):
+```
+AAAA @  2606:50c0:8000::153
+AAAA @  2606:50c0:8001::153
+AAAA @  2606:50c0:8002::153
+AAAA @  2606:50c0:8003::153
+```
+
+Если используешь **поддомен** (`os.raam.example` / `www.raam.example`) — одна запись:
+```
+CNAME   os   <твой-логин>.github.io
+```
+
+DNS обновляется от нескольких минут до пары часов. После — открой `Settings → Pages`, дождись «✓ DNS check successful», включи **Enforce HTTPS**.
+
+> Важно: имя в файле `CNAME` (внутри репозитория) и Custom domain в настройках должны совпадать с доменом, на который ведут DNS-записи.
+
+## Проверка
+- Сайт открывается на телефоне на весь экран, текст разбит по строкам, появляется с анимацией, внизу — розовая кнопка «Open Telegram», ведущая на `https://t.me/raam_est`.
